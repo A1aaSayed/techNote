@@ -10,7 +10,6 @@ router.get('/', (req, res) => {
 
 router.get('*', (req, res, next) => {
     res.status(404);
-    
     // HTML
     if (req.accepts('html')) {
         res.sendFile(path.join(__dirname, '../public/error.html'))

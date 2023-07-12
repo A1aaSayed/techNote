@@ -1,15 +1,12 @@
-function globalError(err, req, res, next) {
-    const specialId = Math.floor(Math.random() * 1000);
-    const { date, time } = getCurrentDateTime();
-    const message = `Error, ${err.message}`;
-    const errLog = [`${specialId}   ${date}   ${time}   ${message}`];
+const {logEvents} = require('./logger');
 
-    fs.appendFile(errorFile, errLog, (err) => {
-        if (err) {
-            console.error(`Error, Can't write in log file`)
-        }
-    });
-    res.status(err.status || 500).json({error: err.message})
-};
+const errorHandler = (err, req, res, next) => {
+    logEvents(`${err.name}: ${err.message}\t ${req.method}\t ${req.url}\t ${req.headers.origin}`, 'errors.log');
+    console.log(err.stack);
+    
+    const status = res.statusCode ? res.statusCode : 500;
+    res.status(status);
+    res.json({ error: err.message, isError: true });
+}
 
-module.exports = globalError;
+module.exports = errorHandler;
